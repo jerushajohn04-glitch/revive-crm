@@ -1,0 +1,1999 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Revive Auto Parts CRM</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #667085;
+      --line: #d7dee8;
+      --paper: #f5f7fb;
+      --panel: #ffffff;
+      --nav: #102033;
+      --accent: #1478d4;
+      --accent-2: #0f9f7a;
+      --warn: #d9822b;
+      --danger: #c2413b;
+      --violet: #6c4ed9;
+      --shadow: 0 12px 30px rgba(16, 32, 51, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 252px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      background: var(--nav);
+      color: #e8eef7;
+      padding: 22px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 42px;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(20, 120, 212, 0.95), rgba(15, 159, 122, 0.95)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Cpath d='M18 46h44l-5-14H28l-10 14Z' fill='%23ffffff' fill-opacity='.86'/%3E%3Ccircle cx='29' cy='50' r='6' fill='%23102033'/%3E%3Ccircle cx='53' cy='50' r='6' fill='%23102033'/%3E%3Cpath d='M34 24h20v6H34z' fill='%23ffffff' fill-opacity='.86'/%3E%3C/svg%3E");
+      background-size: cover;
+      flex: 0 0 auto;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    .brand span {
+      display: block;
+      color: #aebbd0;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      border: 0;
+      border-radius: 7px;
+      color: #cbd7e8;
+      background: transparent;
+      padding: 11px 12px;
+      text-align: left;
+    }
+
+    .nav button:hover,
+    .nav button.active {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.10);
+    }
+
+    .nav svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+      flex: 0 0 auto;
+    }
+
+    .sidebar-foot {
+      margin-top: auto;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      color: #b9c7d8;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: rgba(245, 247, 251, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      padding: 16px 28px;
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 12px;
+      height: 42px;
+      box-shadow: 0 1px 0 rgba(16, 32, 51, 0.03);
+    }
+
+    .search input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      min-width: 80px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      min-height: 40px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      padding: 0 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .btn.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .btn.icon {
+      width: 40px;
+      padding: 0;
+      justify-content: center;
+    }
+
+    .content {
+      padding: 24px 28px 36px;
+      display: grid;
+      gap: 22px;
+    }
+
+    .page-title {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .subtext {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 106px;
+      box-shadow: 0 1px 0 rgba(16, 32, 51, 0.03);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 28px;
+      margin-top: 10px;
+      letter-spacing: 0;
+    }
+
+    .metric small {
+      display: block;
+      color: var(--accent-2);
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .section-head {
+      padding: 16px 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .chip.active {
+      background: #e7f1fb;
+      color: #0b5fa8;
+      border-color: #b8d7f2;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th,
+    td {
+      padding: 13px 16px;
+      text-align: left;
+      border-bottom: 1px solid #eef2f6;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: #fbfcfe;
+    }
+
+    td strong {
+      display: block;
+      margin-bottom: 4px;
+      overflow-wrap: anywhere;
+    }
+
+    td span {
+      color: var(--muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+
+    .status.lead { background: #eaf3ff; color: #1264ac; border-color: #b8d7f2; }
+    .status.quoted { background: #fff4df; color: #9b5b00; border-color: #f7c873; }
+    .status.vm { background: #eef2ff; color: #5b3fc4; border-color: #cbc7ff; }
+    .status.disconnected { background: #f3f4f6; color: #475467; border-color: #d0d5dd; }
+    .status.bad { background: #fff0ef; color: #a33a35; border-color: #f1b6b2; }
+    .status.callback { background: #e6f8f2; color: #08755d; border-color: #9fe2cf; }
+    .status.won { background: #e7f7e9; color: #16703a; border-color: #a7dcb4; }
+    .status.lost { background: #fde8e7; color: #7f1d1d; border-color: #eba6a4; }
+    .status.procure { background: #f0edff; color: #5940bf; border-color: #cbc7ff; }
+    .status.shipped { background: #edf7ff; color: #26637f; border-color: #b8d7f2; }
+    .status.issue { background: #fff0ef; color: #a33a35; border-color: #f1b6b2; }
+
+    tr.status-row.lead { box-shadow: inset 4px 0 0 #1478d4; background: #fbfdff; }
+    tr.status-row.quoted { box-shadow: inset 4px 0 0 #d9822b; background: #fffdf7; }
+    tr.status-row.vm { box-shadow: inset 4px 0 0 #6c4ed9; background: #fcfbff; }
+    tr.status-row.callback { box-shadow: inset 4px 0 0 #0f9f7a; background: #fbfffd; }
+    tr.status-row.bad { box-shadow: inset 4px 0 0 #c2413b; background: #fffafa; }
+    tr.status-row.disconnected { box-shadow: inset 4px 0 0 #667085; background: #fcfcfd; }
+    tr.status-row.won { box-shadow: inset 4px 0 0 #2f9e44; background: #fbfffb; }
+    tr.status-row.lost { box-shadow: inset 4px 0 0 #7f1d1d; background: #fffafa; }
+
+    .money {
+      font-weight: 750;
+      color: #0f7a60;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(150px, 1fr));
+      gap: 10px;
+      overflow-x: auto;
+      padding: 16px;
+    }
+
+    .stage {
+      background: #f8fafc;
+      border: 1px solid #e5ebf2;
+      border-radius: 8px;
+      min-height: 240px;
+    }
+
+    .stage h3 {
+      margin: 0;
+      padding: 12px;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      color: #334155;
+    }
+
+    .deal {
+      margin: 0 10px 10px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-left: 5px solid #1478d4;
+      border-radius: 8px;
+      padding: 11px;
+    }
+
+    .deal.lead { border-left-color: #1478d4; }
+    .deal.quoted { border-left-color: #d9822b; }
+    .deal.vm { border-left-color: #6c4ed9; }
+    .deal.callback { border-left-color: #0f9f7a; }
+    .deal.bad { border-left-color: #c2413b; }
+    .deal.disconnected { border-left-color: #667085; }
+    .deal.won { border-left-color: #2f9e44; }
+    .deal.lost { border-left-color: #7f1d1d; }
+
+    .deal strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      overflow-wrap: anywhere;
+    }
+
+    .deal p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .record-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .mini-btn {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: #344054;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .mini-btn.danger {
+      color: var(--danger);
+      border-color: #f1b6b2;
+      background: #fff7f6;
+    }
+
+    .status-select {
+      min-height: 32px;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .form {
+      padding: 16px;
+      display: grid;
+      gap: 13px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #344054;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 9px 10px;
+      background: #ffffff;
+      color: var(--ink);
+      outline-color: #9ec9ee;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 76px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 0;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid #eef2f6;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin: 4px auto 0;
+      box-shadow: 0 0 0 5px #e7f1fb;
+    }
+
+    .event strong {
+      font-size: 14px;
+    }
+
+    .event p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .empty {
+      padding: 26px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .notice {
+      margin: 16px;
+      padding: 12px;
+      border: 1px solid #b8d7f2;
+      border-radius: 8px;
+      background: #eef7ff;
+      color: #184b73;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .notice.error {
+      border-color: #f1b6b2;
+      background: #fff7f6;
+      color: #8a2d29;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(16, 32, 51, 0.44);
+    }
+
+    .modal {
+      width: min(680px, 100%);
+      max-height: min(760px, 92vh);
+      overflow: auto;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 24px 60px rgba(16, 32, 51, 0.25);
+    }
+
+    .modal-head {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .modal-body {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .email-preview {
+      min-height: 220px;
+      white-space: pre-wrap;
+      line-height: 1.55;
+      color: #344054;
+      background: #fbfcfe;
+    }
+
+    .modal-foot {
+      padding: 14px 18px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1080px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+      }
+
+      .nav {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .metrics,
+      .workspace {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .workspace {
+        align-items: stretch;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar,
+      .page-title,
+      .section-head {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .topbar {
+        padding: 14px;
+      }
+
+      .content {
+        padding: 18px 14px 28px;
+      }
+
+      .metrics,
+      .workspace,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      table {
+        min-width: 760px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>
+          <strong>Revive Auto Parts</strong>
+          <span>Auto parts sales desk</span>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <button class="active" data-view="dashboard" title="Dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 13h8V3H3v10Zm10 8h8V3h-8v18ZM3 21h8v-6H3v6Z"/></svg>
+          Dashboard
+        </button>
+        <button data-view="leads" title="Leads">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"/></svg>
+          Leads
+        </button>
+        <button data-view="pipeline" title="Pipeline">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 12h10M4 18h6"/></svg>
+          Pipeline
+        </button>
+        <button data-view="orders" title="Orders">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M7 7h14l-2 9H8L6 3H3"/><path d="M9 20h.01M18 20h.01"/></svg>
+          Orders
+        </button>
+        <button data-view="sourcing" title="Sourcing">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m14.7 6.3 3 3M3 21l3.6-1 11-11a2.1 2.1 0 0 0-3-3l-11 11L3 21Z"/><path d="M12 20h9"/></svg>
+          Sourcing
+        </button>
+        <button data-view="shipping" title="Shipping">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7h11v10H3z"/><path d="M14 10h4l3 3v4h-7z"/><path d="M7 21a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm10 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
+          Shipping
+        </button>
+      </nav>
+
+      <div class="sidebar-foot">
+        Today: work fresh leads first, then quote, leave VM, mark bad numbers, and set call backs.
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#667085"><path d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="7"/></svg>
+          <input id="searchInput" placeholder="Search customer, phone, VIN, part, make, model">
+        </div>
+        <div class="actions">
+          <button class="btn icon" id="exportBtn" title="Export visible records">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M5 21h14"/></svg>
+          </button>
+          <button class="btn primary" data-view="leads" id="newLeadShortcut">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
+            New Lead
+          </button>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="page-title">
+          <div>
+            <h1 id="pageTitle">Operations Dashboard</h1>
+            <p class="subtext" id="pageSubtext">Track leads, quotes, call outcomes, junkyard procurement, drop-shipping, and profit in one desk.</p>
+          </div>
+          <div class="filters" id="quickFilters">
+            <button class="chip active" data-filter="all">All</button>
+            <button class="chip" data-filter="new">New Leads</button>
+            <button class="chip" data-filter="quoted">Quoted</button>
+            <button class="chip" data-filter="vm">VM</button>
+            <button class="chip" data-filter="callback">Call Back</button>
+            <button class="chip" data-filter="bad">Bad Number</button>
+            <button class="chip" data-filter="won">Won</button>
+          </div>
+        </div>
+
+        <section class="metrics" id="metrics"></section>
+
+        <section class="workspace">
+          <div class="section" id="primaryPanel"></div>
+          <div class="section" id="sidePanel"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div id="emailModalRoot"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const LEAD_STATUSES = ["Lead", "Quoted", "VM", "Disconnected", "Bad Number", "Call Back", "Won", "Lost"];
+    const CRM_CONFIG_KEY = "reviveAutoPartsSupabaseConfig";
+    const SUPABASE_URL = "https://lhsucaikkszgwplywaea.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxoc3VjYWlra3N6Z3dwbHl3YWVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMjEwOTIsImV4cCI6MjA5Njc5NzA5Mn0.weeDbiW6esGoHupEk0gO7N4VsCujn4t8E0-exHBNfYg";
+    const EMAIL_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7BSWmaZuiuzU5HI6zOhimHXWikatCoDEJr8uCktNDeSFxlOG-yBkBdOvanFvTXLfPCg/exec";
+    const ADMIN_MODE = new URLSearchParams(window.location.search).get("admin") === "1";
+
+    let records = [
+      {
+        id: "BP-1049",
+        source: "Google Ads",
+        customer: "Elena Torres",
+        phone: "(214) 555-0126",
+        email: "elena.torres@example.com",
+        address: "411 Commerce St, Dallas, TX",
+        vehicle: { year: "2017", make: "Jeep", model: "Wrangler", vin: "" },
+        part: "Driver side fender",
+        status: "Lead",
+        agent: "Mia",
+        priority: "Urgent",
+        sale: 0,
+        supplierCost: 0,
+        shippingCost: 0,
+        supplier: "",
+        tracking: "",
+        eta: "Call now",
+        notes: "Fresh Google Ads lead. Confirm color and side before quote."
+      },
+      {
+        id: "BP-1048",
+        source: "Google Ads",
+        customer: "Marcus Lee",
+        phone: "(312) 555-0184",
+        email: "marcus.lee@example.com",
+        address: "1845 W Division St, Chicago, IL",
+        vehicle: { year: "2018", make: "Toyota", model: "Camry", vin: "4T1B11HK7JU123456" },
+        part: "Rear passenger door shell",
+        status: "Call Back",
+        agent: "Ava",
+        priority: "Urgent",
+        sale: 725,
+        supplierCost: 410,
+        shippingCost: 85,
+        supplier: "Midwest Auto Recyclers",
+        tracking: "",
+        eta: "Jun 19",
+        notes: "Customer paid. Need color match: silver preferred."
+      },
+      {
+        id: "BP-1047",
+        source: "Phone",
+        customer: "Angela Morris",
+        phone: "(602) 555-0168",
+        email: "angela.morris@example.com",
+        address: "902 E Pierce St, Phoenix, AZ",
+        vehicle: { year: "2016", make: "Ford", model: "F-150", vin: "" },
+        part: "5.0 engine assembly",
+        status: "Quoted",
+        agent: "Noah",
+        priority: "Normal",
+        sale: 2850,
+        supplierCost: 2050,
+        shippingCost: 280,
+        supplier: "Desert Yard Parts",
+        tracking: "",
+        eta: "Quote expires today",
+        notes: "Waiting for customer approval and payment link."
+      },
+      {
+        id: "BP-1046",
+        source: "Google Ads",
+        customer: "Brian Scott",
+        phone: "(718) 555-0142",
+        email: "brian.scott@example.com",
+        address: "44 Wilson Ave, Brooklyn, NY",
+        vehicle: { year: "2020", make: "Honda", model: "Accord", vin: "1HGCV1F30LA000221" },
+        part: "LED headlight driver side",
+        status: "VM",
+        agent: "Mia",
+        priority: "Normal",
+        sale: 495,
+        supplierCost: 260,
+        shippingCost: 42,
+        supplier: "Garden State Salvage",
+        tracking: "1Z5338W90300439122",
+        eta: "Jun 18",
+        notes: "Send delivery check text after UPS scan."
+      },
+      {
+        id: "BP-1045",
+        source: "Google Ads",
+        customer: "Priya Shah",
+        phone: "(510) 555-0197",
+        email: "priya.shah@example.com",
+        address: "321 Grand Ave, Oakland, CA",
+        vehicle: { year: "2019", make: "Nissan", model: "Altima", vin: "" },
+        part: "Transmission CVT",
+        status: "Disconnected",
+        agent: "Ava",
+        priority: "Urgent",
+        sale: 1950,
+        supplierCost: 1375,
+        shippingCost: 210,
+        supplier: "Bay Area Dismantlers",
+        tracking: "",
+        eta: "Awaiting pickup",
+        notes: "Payment captured. Supplier needs commercial address confirmation."
+      },
+      {
+        id: "BP-1044",
+        source: "Phone",
+        customer: "Derek White",
+        phone: "(404) 555-0119",
+        email: "derek.white@example.com",
+        address: "78 Howell Mill Rd, Atlanta, GA",
+        vehicle: { year: "2015", make: "Chevrolet", model: "Malibu", vin: "1G11C5SL5FF000812" },
+        part: "Front bumper cover",
+        status: "Bad Number",
+        agent: "Noah",
+        priority: "Normal",
+        sale: 0,
+        supplierCost: 0,
+        shippingCost: 0,
+        supplier: "",
+        tracking: "",
+        eta: "Call by 3 PM",
+        notes: "Asked for black bumper, accepts paint-ready if cheaper."
+      }
+    ];
+
+    const views = {
+      dashboard: {
+        title: "Operations Dashboard",
+        subtext: "Track leads, quotes, call outcomes, junkyard procurement, drop-shipping, and profit in one desk."
+      },
+      leads: {
+        title: "Lead Inbox",
+        subtext: "Capture Google Ads and phone leads with vehicle, part, customer, and agent details."
+      },
+      pipeline: {
+        title: "Sales Pipeline",
+        subtext: "Move calls through Lead, Quoted, VM, Disconnected, Bad Number, Call Back, Won, and Lost."
+      },
+      orders: {
+        title: "Paid Orders",
+        subtext: "Orders that need supplier sourcing, confirmation, or customer updates."
+      },
+      sourcing: {
+        title: "Junkyard Sourcing",
+        subtext: "Compare supplier cost, part availability, warranty, ETA, and margin."
+      },
+      shipping: {
+        title: "Drop-Ship Tracking",
+        subtext: "Watch tracking numbers, delivery ETAs, and follow-up calls."
+      }
+    };
+
+    const state = {
+      view: "dashboard",
+      search: "",
+      filter: "all",
+      editingId: null,
+      loading: false,
+      dbMessage: "",
+      pendingEmail: null
+    };
+
+    let supabaseClient = null;
+
+    const icons = {
+      phone: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7l.4 2.7a2 2 0 0 1-.6 1.8L7.7 9.4a16 16 0 0 0 6.9 6.9l1.2-1.2a2 2 0 0 1 1.8-.6l2.7.4a2 2 0 0 1 1.7 2Z"/></svg>'
+    };
+
+    function getStoredConfig() {
+      try {
+        return JSON.parse(localStorage.getItem(CRM_CONFIG_KEY)) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function getSupabaseConfig() {
+      const stored = getStoredConfig();
+      const codedUrl = SUPABASE_URL.startsWith("PASTE_") ? "" : SUPABASE_URL;
+      const codedKey = SUPABASE_KEY.startsWith("PASTE_") ? "" : SUPABASE_KEY;
+      return {
+        url: codedUrl || stored.url || "",
+        key: codedKey || stored.key || ""
+      };
+    }
+
+    function hasSupabaseConfig() {
+      const config = getSupabaseConfig();
+      return Boolean(config.url && config.key);
+    }
+
+    function connectSupabase() {
+      if (!hasSupabaseConfig() || !window.supabase) {
+        supabaseClient = null;
+        return false;
+      }
+
+      const config = getSupabaseConfig();
+      supabaseClient = window.supabase.createClient(config.url, config.key);
+      return true;
+    }
+
+    function toNumber(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function mapDbLead(row) {
+      const customer = row.customers || {};
+      return {
+        id: row.id,
+        source: row.source || "Google Ads",
+        customer: customer.name || row.customer_name || "",
+        phone: customer.phone || row.customer_phone || "",
+        email: customer.email || row.customer_email || "",
+        address: customer.address || row.customer_address || "",
+        vehicle: {
+          year: row.vehicle_year || "",
+          make: row.vehicle_make || "",
+          model: row.vehicle_model || "",
+          vin: row.vin || ""
+        },
+        part: row.part_name || "",
+        status: row.status || "Lead",
+        agent: row.agent || "Ava",
+        priority: row.priority || "Normal",
+        sale: toNumber(row.sale_price),
+        supplierCost: toNumber(row.supplier_cost),
+        shippingCost: toNumber(row.shipping_cost),
+        supplier: row.supplier || "",
+        tracking: row.tracking_number || "",
+        eta: row.eta || "",
+        notes: row.notes || "",
+        lastEmailType: row.last_email_type || "",
+        lastEmailSentAt: row.last_email_sent_at || "",
+        emailStatus: row.email_status || ""
+      };
+    }
+
+    function toLeadRow(record, customerId) {
+      return {
+        id: record.id,
+        customer_id: customerId,
+        source: record.source,
+        status: record.status,
+        agent: record.agent,
+        priority: record.priority,
+        vehicle_year: record.vehicle.year,
+        vehicle_make: record.vehicle.make,
+        vehicle_model: record.vehicle.model,
+        vin: record.vehicle.vin || null,
+        part_name: record.part,
+        sale_price: record.sale,
+        supplier_cost: record.supplierCost,
+        shipping_cost: record.shippingCost,
+        supplier: record.supplier || null,
+        tracking_number: record.tracking || null,
+        eta: record.eta || null,
+        notes: record.notes || null
+      };
+    }
+
+    async function loadLeadsFromSupabase() {
+      if (!connectSupabase()) {
+        state.dbMessage = ADMIN_MODE
+          ? "Admin mode: add the Supabase URL and publishable key to connect permanently."
+          : "Database sync is managed by the admin.";
+        return;
+      }
+
+      state.loading = true;
+      render();
+      const { data, error } = await supabaseClient
+        .from("leads")
+        .select("*, customers(*)")
+        .order("created_at", { ascending: false });
+
+      state.loading = false;
+      if (error) {
+        state.dbMessage = `Supabase load error: ${error.message}`;
+        render();
+        return;
+      }
+
+      records = (data || []).map(mapDbLead);
+      state.dbMessage = "Connected to Supabase. Leads are loading from the database.";
+      render();
+    }
+
+    async function saveLeadToSupabase(record) {
+      if (!supabaseClient) return record;
+
+      const { data: customer, error: customerError } = await supabaseClient
+        .from("customers")
+        .upsert({
+          name: record.customer,
+          phone: record.phone,
+          email: record.email,
+          address: record.address
+        }, { onConflict: "phone" })
+        .select()
+        .single();
+
+      if (customerError) throw customerError;
+
+      const { data, error } = await supabaseClient
+        .from("leads")
+        .upsert(toLeadRow(record, customer.id), { onConflict: "id" })
+        .select("*, customers(*)")
+        .single();
+
+      if (error) throw error;
+      return mapDbLead(data);
+    }
+
+    async function deleteLeadFromSupabase(id) {
+      if (!ADMIN_MODE) {
+        alert("Only admin can delete leads.");
+        return false;
+      }
+      if (!supabaseClient) return;
+      const { error } = await supabaseClient.from("leads").delete().eq("id", id);
+      if (error) throw error;
+      return true;
+    }
+
+    async function updateLeadStatus(id, status) {
+      const record = records.find((item) => item.id === id);
+      if (!record) return;
+
+      const previousStatus = record.status;
+      record.status = status;
+      render();
+
+      if (!supabaseClient) {
+        const emailType = emailTypeForStatus(status);
+        if (emailType) {
+          state.pendingEmail = {
+            leadId: record.id,
+            emailType,
+            ...buildEmailTemplate(record, emailType)
+          };
+        }
+        state.dbMessage = "Status changed in demo mode only. Supabase is not connected.";
+        render();
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from("leads")
+        .update({ status })
+        .eq("id", id);
+
+      if (error) {
+        record.status = previousStatus;
+        state.dbMessage = `Supabase status update error: ${error.message}`;
+      } else {
+        state.dbMessage = "Lead status updated in Supabase.";
+        const emailType = emailTypeForStatus(status);
+        if (emailType) {
+          state.pendingEmail = {
+            leadId: record.id,
+            emailType,
+            ...buildEmailTemplate(record, emailType)
+          };
+        }
+      }
+      render();
+    }
+
+    async function skipPendingEmail() {
+      if (!state.pendingEmail) return;
+      const pending = state.pendingEmail;
+      const record = records.find((item) => item.id === pending.leadId);
+
+      if (record) {
+        record.lastEmailType = pending.emailType;
+        record.emailStatus = "skipped";
+        record.lastEmailSentAt = "";
+      }
+
+      if (supabaseClient) {
+        const { error } = await supabaseClient
+          .from("leads")
+          .update({
+            last_email_type: pending.emailType,
+            last_email_sent_at: null,
+            email_status: "skipped"
+          })
+          .eq("id", pending.leadId);
+
+        if (error) {
+          state.dbMessage = `Supabase email status error: ${error.message}`;
+        } else {
+          state.dbMessage = "Email skipped and saved to Supabase.";
+        }
+      } else {
+        state.dbMessage = "Email skipped in demo mode.";
+      }
+
+      state.pendingEmail = null;
+      render();
+    }
+
+    async function updateEmailStatus(leadId, emailType, emailStatus, sentAt = null) {
+      if (!supabaseClient) return null;
+
+      const { error } = await supabaseClient
+        .from("leads")
+        .update({
+          last_email_type: emailType,
+          last_email_sent_at: sentAt,
+          email_status: emailStatus
+        })
+        .eq("id", leadId);
+
+      if (error) throw error;
+      return sentAt;
+    }
+
+    async function sendPendingEmail() {
+      if (!state.pendingEmail) return;
+      if (!supabaseClient) {
+        alert("Supabase must be connected before sending email.");
+        return;
+      }
+
+      const pending = state.pendingEmail;
+      const record = records.find((item) => item.id === pending.leadId);
+      if (!record?.email) {
+        alert("Customer email is missing.");
+        return;
+      }
+
+      try {
+        await fetch(EMAIL_WEB_APP_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({
+            to: record.email,
+            subject: pending.subject,
+            message: pending.body,
+            leadId: pending.leadId,
+            emailType: pending.emailType
+          })
+        });
+
+        const sentAt = new Date().toISOString();
+        await updateEmailStatus(pending.leadId, pending.emailType, "sent", sentAt);
+        record.lastEmailType = pending.emailType;
+        record.emailStatus = "sent";
+        record.lastEmailSentAt = sentAt;
+        state.pendingEmail = null;
+        state.dbMessage = "Email sent and saved to Supabase.";
+        render();
+      } catch (error) {
+        try {
+          await updateEmailStatus(pending.leadId, pending.emailType, "failed", null);
+        } catch (statusError) {
+          state.dbMessage = `Email failed, and Supabase status update failed: ${statusError.message}`;
+          render();
+          return;
+        }
+
+        if (record) {
+          record.lastEmailType = pending.emailType;
+          record.emailStatus = "failed";
+          record.lastEmailSentAt = "";
+        }
+        state.dbMessage = `Email send error: ${error.message}`;
+        render();
+      }
+    }
+
+    function currency(value) {
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+    }
+
+    function margin(record) {
+      return record.sale - record.supplierCost - record.shippingCost;
+    }
+
+    function statusClass(status) {
+      return {
+        "Lead": "lead",
+        "New Email Lead": "lead",
+        "Quoted": "quoted",
+        "VM": "vm",
+        "Voicemail": "vm",
+        "Disconnected": "disconnected",
+        "Bad Number": "bad",
+        "Call Back": "callback",
+        "Won": "won",
+        "Sale Closed": "won",
+        "Lost": "lost",
+        "Procurement": "procure",
+        "Shipped": "shipped",
+        "Issue": "issue"
+      }[status] || "lead";
+    }
+
+    function statusFilterMatches(filter, status) {
+      const statusKey = statusClass(status);
+      if (filter === "all") return true;
+      if (filter === "new") return ["Lead", "New Email Lead"].includes(status);
+      return filter === statusKey;
+    }
+
+    function renderStatusOptions(selectedStatus) {
+      return LEAD_STATUSES.map((status) => `<option ${selectedStatus === status ? "selected" : ""}>${status}</option>`).join("");
+    }
+
+    function emailTypeForStatus(status) {
+      if (status === "Quoted") return "quoted";
+      if (["VM", "Voicemail"].includes(status)) return "voicemail";
+      if (status === "Bad Number") return "bad_number";
+      if (["Won", "Sale Closed"].includes(status)) return "won";
+      return "";
+    }
+
+    function vehicleLabel(record) {
+      return [record.vehicle.year, record.vehicle.make, record.vehicle.model].filter(Boolean).join(" ");
+    }
+
+    function quoteText(record) {
+      return record.sale > 0 ? currency(record.sale) : "the quoted price";
+    }
+
+    function buildEmailTemplate(record, emailType) {
+      const name = record.customer || "there";
+      const vehicle = vehicleLabel(record) || "your vehicle";
+      const part = record.part || "the requested part";
+      const price = quoteText(record);
+      const emailHeader = `Revive Auto Parts
+Used Auto Parts Quote & Order Support`;
+      const detailBlock = `Vehicle Details:
+${vehicle}
+
+Part Requested:
+${part}
+
+Quote Price:
+${price}`;
+      const emailFooter = `Thank you for choosing Revive Auto Parts.
+
+Toll Free: (888) 769-6673
+Website: https://reviveabsmodule.store
+Email: reviveautoparts1715@gmail.com
+
+Hours:
+Monday-Friday 9 AM-5 PM EST
+
+Please reply to this email or call us if you have any questions.
+
+Sincerely,
+Revive Auto Parts Customer Support`;
+
+      if (emailType === "quoted") {
+        return {
+          type: emailType,
+          subject: `Quote for ${part} - Revive Auto Parts`,
+          body: `${emailHeader}
+
+Hi ${name},
+
+Good news. We have the requested part available for your vehicle.
+
+${detailBlock}
+
+To move forward, reply to this email or call us so we can confirm availability, warranty, and delivery details.
+
+${emailFooter}`
+        };
+      }
+
+      if (emailType === "voicemail") {
+        return {
+          type: emailType,
+          subject: `We tried calling about your ${part} request`,
+          body: `${emailHeader}
+
+Hi ${name},
+
+We tried calling you about your parts request. We do have the requested part available.
+
+${detailBlock}
+
+Please reply to this email or call us back so we can confirm the details and help you complete the order.
+
+${emailFooter}`
+        };
+      }
+
+      if (emailType === "bad_number") {
+        return {
+          type: emailType,
+          subject: `Need correct phone number for your ${part} request`,
+          body: `${emailHeader}
+
+Hi ${name},
+
+We tried reaching you by phone about your parts request, but we could not get through with the number provided.
+
+We do have the requested part available.
+
+${detailBlock}
+
+Please reply with the correct phone number so our team can finish confirming your quote.
+
+${emailFooter}`
+        };
+      }
+
+      return {
+        type: emailType,
+        subject: `Order confirmation - ${part}`,
+        body: `${emailHeader}
+
+Hi ${name},
+
+Thank you for your order with Revive Auto Parts.
+
+This confirms your order for the requested part.
+
+${detailBlock}
+
+Our team will continue working on sourcing and shipping updates, and we will contact you with the next steps.
+
+${emailFooter}`
+      };
+    }
+
+    function renderRecordActions(record) {
+      return `
+        <div class="record-actions">
+          <button class="mini-btn" type="button" data-action="edit" data-id="${record.id}">Edit</button>
+          ${ADMIN_MODE ? `<button class="mini-btn danger" type="button" data-action="delete" data-id="${record.id}">Delete</button>` : ""}
+        </div>
+      `;
+    }
+
+    function filteredRecords() {
+      const query = state.search.trim().toLowerCase();
+      return records.filter((record) => {
+        const text = [
+          record.id, record.source, record.customer, record.phone, record.email,
+          record.address, record.vehicle.year, record.vehicle.make, record.vehicle.model,
+          record.vehicle.vin, record.part, record.status, record.agent, record.supplier
+        ].join(" ").toLowerCase();
+
+        const matchesQuery = !query || text.includes(query);
+        const matchesFilter = statusFilterMatches(state.filter, record.status);
+
+        if (state.view === "orders" && !["Quoted", "Call Back", "Won"].includes(record.status)) return false;
+        if (state.view === "sourcing" && record.sale <= 0) return false;
+        if (state.view === "shipping" && !record.tracking) return false;
+
+        return matchesQuery && matchesFilter;
+      });
+    }
+
+    function renderMetrics() {
+      const totalLeads = records.length;
+      const quoted = records.filter((record) => record.status === "Quoted").length;
+      const callBacks = records.filter((record) => record.status === "Call Back").length;
+      const badNumbers = records.filter((record) => ["Disconnected", "Bad Number"].includes(record.status)).length;
+      const totalMargin = records.reduce((sum, record) => sum + Math.max(0, margin(record)), 0);
+      const metricData = [
+        ["Open leads", totalLeads, "Google Ads + phone intake"],
+        ["Quoted", quoted, "Customers with price sent"],
+        ["Call backs", callBacks, "Follow-up queue"],
+        ["Bad numbers", badNumbers, `Potential margin ${currency(totalMargin)}`]
+      ];
+
+      document.querySelector("#metrics").innerHTML = metricData.map(([label, value, helper]) => `
+        <article class="metric">
+          <span>${label}</span>
+          <strong>${value}</strong>
+          <small>${helper}</small>
+        </article>
+      `).join("");
+    }
+
+    function renderTable(title, rows) {
+      if (!rows.length) {
+        return `
+          <div class="section-head"><h2>${title}</h2></div>
+          <div class="empty">No records match the current view.</div>
+        `;
+      }
+
+      return `
+        <div class="section-head">
+          <h2>${title}</h2>
+          <span class="chip">${rows.length} records</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 22%">Customer</th>
+                <th style="width: 20%">Vehicle / Part</th>
+                <th style="width: 14%">Status</th>
+                <th style="width: 16%">Money</th>
+                <th style="width: 18%">Supplier / ETA</th>
+                <th style="width: 10%">Agent</th>
+                <th style="width: 12%">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map((record) => `
+                <tr class="status-row ${statusClass(record.status)}">
+                  <td>
+                    <strong>${record.customer}</strong>
+                    <span>${record.phone}<br>${record.email}</span>
+                  </td>
+                  <td>
+                    <strong>${record.vehicle.year} ${record.vehicle.make} ${record.vehicle.model}</strong>
+                    <span>${record.part}${record.vehicle.vin ? `<br>VIN ${record.vehicle.vin}` : ""}</span>
+                  </td>
+                  <td>
+                    <span class="status ${statusClass(record.status)}">${record.status}</span>
+                    <br><span>${record.source} | ${record.priority}</span>
+                  </td>
+                  <td>
+                    <strong>${record.sale ? currency(record.sale) : "Not quoted"}</strong>
+                    <span>Margin <span class="money">${record.sale ? currency(margin(record)) : "$0"}</span></span>
+                  </td>
+                  <td>
+                    <strong>${record.supplier || "Need supplier"}</strong>
+                    <span>${record.tracking ? `Tracking ${record.tracking}` : record.eta}</span>
+                  </td>
+                  <td><strong>${record.agent}</strong><span>${record.id}</span></td>
+                  <td>
+                    ${renderRecordActions(record)}
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderPipeline(rows) {
+      const stages = LEAD_STATUSES;
+      return `
+        <div class="section-head">
+          <h2>Pipeline Board</h2>
+          <span class="chip">Separate call outcome sections</span>
+        </div>
+        <div class="pipeline">
+          ${stages.map((stage) => {
+            const stageRows = rows.filter((record) => record.status === stage);
+            return `
+              <div class="stage">
+                <h3>${stage}<span>${stageRows.length}</span></h3>
+                ${stageRows.map((record) => `
+                  <article class="deal ${statusClass(record.status)}">
+                    <strong>${record.customer}</strong>
+                    <span class="status ${statusClass(record.status)}">${record.status}</span>
+                    <p>${record.vehicle.year} ${record.vehicle.make} ${record.vehicle.model}<br>${record.part}<br>${record.sale ? currency(record.sale) : "Quote pending"}</p>
+                    <label>Status
+                      <select class="status-select" data-action="status-change" data-id="${record.id}">
+                        ${renderStatusOptions(record.status)}
+                      </select>
+                    </label>
+                    ${renderRecordActions(record)}
+                  </article>
+                `).join("") || '<div class="empty">Clear</div>'}
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function renderConnectionPanel() {
+      const config = getSupabaseConfig();
+      const connected = Boolean(supabaseClient);
+      if (!ADMIN_MODE) {
+        return `
+          <div class="notice">
+            <strong>Supabase connected</strong><br>
+            <div class="actions" style="margin-top: 12px;">
+              <button class="btn" type="button" id="reloadLeads">Reload Leads</button>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="notice ${state.dbMessage.includes("error") ? "error" : ""}">
+          <strong>${connected ? "Supabase connected" : "Supabase admin setup"}</strong><br>
+          ${state.dbMessage || "Admin mode: update Supabase Project URL and publishable key."}
+          <form class="form" id="configForm">
+            <label>Project URL
+              <input id="supabaseUrl" placeholder="https://your-project.supabase.co" value="${escapeHtml(config.url || "")}">
+            </label>
+            <label>Publishable / anon key
+              <input id="supabaseKey" placeholder="sb_publishable_... or anon key" value="${escapeHtml(config.key || "")}">
+            </label>
+            <div class="actions">
+              <button class="btn primary" type="submit">Save Supabase</button>
+              <button class="btn" type="button" id="reloadLeads">Reload Leads</button>
+              <button class="btn" type="button" id="clearConfig">Clear</button>
+            </div>
+          </form>
+        </div>
+      `;
+    }
+
+    function renderEmailModal() {
+      const root = document.querySelector("#emailModalRoot");
+      if (!root) return;
+
+      if (!state.pendingEmail) {
+        root.innerHTML = "";
+        return;
+      }
+
+      const pending = state.pendingEmail;
+      const record = records.find((item) => item.id === pending.leadId);
+      root.innerHTML = `
+        <div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="emailPreviewTitle">
+          <div class="modal">
+            <div class="modal-head">
+              <h2 id="emailPreviewTitle">Email Preview</h2>
+              <span class="status ${record ? statusClass(record.status) : "lead"}">${record?.status || "Email"}</span>
+            </div>
+            <div class="modal-body">
+              <label>To
+                <input readonly value="${escapeHtml(record?.email || "")}">
+              </label>
+              <label>Subject
+                <input readonly value="${escapeHtml(pending.subject)}">
+              </label>
+              <label>Message
+                <textarea class="email-preview" readonly>${escapeHtml(pending.body)}</textarea>
+              </label>
+              <div class="notice">
+                Emails are sent only through the secure Supabase Edge Function. The browser never uses an email provider API key.
+              </div>
+            </div>
+            <div class="modal-foot">
+              <button class="btn" type="button" id="skipEmailBtn">Skip Email</button>
+              <button class="btn primary" type="button" id="sendEmailBtn">Send Email</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLeadForm() {
+      const editing = records.find((record) => record.id === state.editingId);
+      const record = editing || {
+        source: "Google Ads",
+        agent: "Ava",
+        status: "Lead",
+        customer: "",
+        phone: "",
+        email: "",
+        address: "",
+        vehicle: { year: "", make: "", model: "", vin: "" },
+        part: "",
+        sale: 0,
+        supplierCost: 0,
+        shippingCost: 0,
+        supplier: "",
+        tracking: "",
+        eta: "",
+        notes: ""
+      };
+      return `
+        <div class="section-head">
+          <h2>${editing ? "Edit Lead" : "Quick Lead Entry"}</h2>
+          <span class="chip active">${editing ? record.id : "Google Ads or Phone"}</span>
+        </div>
+        ${renderConnectionPanel()}
+        <form class="form" id="leadForm">
+          <div class="form-grid">
+            <label>Source
+              <select id="source">
+                ${["Google Ads", "Phone"].map((source) => `<option ${record.source === source ? "selected" : ""}>${source}</option>`).join("")}
+              </select>
+            </label>
+            <label>Sales Agent
+              <select id="agent">
+                ${["Ava", "Noah", "Mia"].map((agent) => `<option ${record.agent === agent ? "selected" : ""}>${agent}</option>`).join("")}
+              </select>
+            </label>
+          </div>
+          <label>Lead Status
+            <select id="status">
+              ${renderStatusOptions(record.status)}
+            </select>
+          </label>
+          <div class="form-grid">
+            <label>Customer Name <input id="customer" required placeholder="Full name" value="${escapeHtml(record.customer)}"></label>
+            <label>Phone <input id="phone" required placeholder="(555) 555-0100" value="${escapeHtml(record.phone)}"></label>
+          </div>
+          <label>Email <input id="email" required placeholder="customer@example.com" value="${escapeHtml(record.email)}"></label>
+          <label>Address <input id="address" required placeholder="Street, city, state" value="${escapeHtml(record.address)}"></label>
+          <div class="form-grid">
+            <label>Year <input id="year" required placeholder="2018" value="${escapeHtml(record.vehicle.year)}"></label>
+            <label>Make <input id="make" required placeholder="Toyota" value="${escapeHtml(record.vehicle.make)}"></label>
+          </div>
+          <div class="form-grid">
+            <label>Model <input id="model" required placeholder="Camry" value="${escapeHtml(record.vehicle.model)}"></label>
+            <label>VIN Optional <input id="vin" placeholder="Optional" value="${escapeHtml(record.vehicle.vin)}"></label>
+          </div>
+          <label>Part Name <input id="part" required placeholder="Engine, transmission, bumper, door..." value="${escapeHtml(record.part)}"></label>
+          <div class="form-grid">
+            <label>Sale Price <input id="sale" type="number" min="0" step="1" value="${record.sale}"></label>
+            <label>Supplier Cost <input id="supplierCost" type="number" min="0" step="1" value="${record.supplierCost}"></label>
+          </div>
+          <div class="form-grid">
+            <label>Shipping Cost <input id="shippingCost" type="number" min="0" step="1" value="${record.shippingCost}"></label>
+            <label>ETA <input id="eta" placeholder="Call back time or ship ETA" value="${escapeHtml(record.eta)}"></label>
+          </div>
+          <label>Supplier <input id="supplier" placeholder="Junkyard / supplier name" value="${escapeHtml(record.supplier)}"></label>
+          <label>Tracking Number <input id="tracking" placeholder="Drop-ship tracking" value="${escapeHtml(record.tracking)}"></label>
+          <label>Notes <textarea id="notes" placeholder="Color, side, engine size, warranty request, delivery constraints">${escapeHtml(record.notes)}</textarea></label>
+          <div class="actions">
+            <button class="btn primary" type="submit">${editing ? "Update Lead" : "Add Lead"}</button>
+            ${editing ? '<button class="btn" type="button" id="cancelEdit">Cancel</button>' : ""}
+          </div>
+        </form>
+      `;
+    }
+
+    function renderTimeline(rows) {
+      const activeRows = rows.slice(0, 5);
+      return `
+        <div class="section-head">
+          <h2>Activity Queue</h2>
+          <span class="chip">${activeRows.length} next steps</span>
+        </div>
+        <div class="timeline">
+          ${activeRows.map((record) => `
+            <div class="event">
+              <span class="dot"></span>
+              <div>
+                <strong>${nextAction(record)}</strong>
+                <p>${record.customer} | ${record.part}<br>${record.notes}</p>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function nextAction(record) {
+      if (record.status === "Lead") return "Call lead and confirm exact part";
+      if (record.status === "Quoted") return "Send payment link and quote expiry";
+      if (record.status === "VM") return "Leave voicemail and retry later";
+      if (record.status === "Disconnected") return "Mark disconnected number and check lead source";
+      if (record.status === "Bad Number") return "Mark bad number and stop calling";
+      if (record.status === "Call Back") return "Call customer at scheduled time";
+      if (record.status === "Won") return "Confirm supplier availability";
+      if (record.status === "Procurement") return "Get tracking from supplier";
+      if (record.status === "Shipped") return "Check delivery and close loop";
+      return "Review issue";
+    }
+
+    function nextRecordId() {
+      const nextNumber = records.reduce((highest, record) => {
+        const number = Number(record.id.replace("BP-", ""));
+        return Number.isFinite(number) ? Math.max(highest, number) : highest;
+      }, 1000) + 1;
+      return `BP-${nextNumber}`;
+    }
+
+    function setView(view) {
+      state.view = view;
+      document.querySelectorAll(".nav button").forEach((item) => item.classList.toggle("active", item.dataset.view === state.view));
+      render();
+    }
+
+    function render() {
+      const view = views[state.view];
+      const rows = filteredRecords();
+      document.querySelector("#pageTitle").textContent = view.title;
+      document.querySelector("#pageSubtext").textContent = view.subtext;
+      renderMetrics();
+
+      if (state.view === "pipeline" || state.view === "leads") {
+        document.querySelector("#primaryPanel").innerHTML = renderPipeline(rows);
+      } else {
+        const titles = {
+          dashboard: "Live Work Queue",
+          leads: "Lead Records",
+          orders: "Order Records",
+          sourcing: "Supplier Sourcing",
+          shipping: "Shipments"
+        };
+        document.querySelector("#primaryPanel").innerHTML = renderTable(titles[state.view] || "Records", rows);
+      }
+
+      document.querySelector("#sidePanel").innerHTML = state.view === "leads" ? renderLeadForm() : renderTimeline(rows);
+      renderEmailModal();
+      wireDynamicEvents();
+    }
+
+    function wireDynamicEvents() {
+      const configForm = document.querySelector("#configForm");
+      if (configForm) {
+        configForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          localStorage.setItem(CRM_CONFIG_KEY, JSON.stringify({
+            url: document.querySelector("#supabaseUrl").value.trim(),
+            key: document.querySelector("#supabaseKey").value.trim()
+          }));
+          state.dbMessage = "Supabase settings saved. Loading saved leads now.";
+          await loadLeadsFromSupabase();
+        });
+      }
+
+      const reloadLeads = document.querySelector("#reloadLeads");
+      if (reloadLeads) {
+        reloadLeads.addEventListener("click", async () => {
+          await loadLeadsFromSupabase();
+        });
+      }
+
+      const clearConfig = document.querySelector("#clearConfig");
+      if (clearConfig) {
+        clearConfig.addEventListener("click", () => {
+          localStorage.removeItem(CRM_CONFIG_KEY);
+          supabaseClient = null;
+          state.dbMessage = "Supabase settings cleared. Demo records are visible again.";
+          render();
+        });
+      }
+
+      const cancelEdit = document.querySelector("#cancelEdit");
+      if (cancelEdit) {
+        cancelEdit.addEventListener("click", () => {
+          state.editingId = null;
+          render();
+        });
+      }
+
+      const sendEmailBtn = document.querySelector("#sendEmailBtn");
+      if (sendEmailBtn) {
+        sendEmailBtn.addEventListener("click", async () => {
+          await sendPendingEmail();
+        });
+      }
+
+      const skipEmailBtn = document.querySelector("#skipEmailBtn");
+      if (skipEmailBtn) {
+        skipEmailBtn.addEventListener("click", async () => {
+          await skipPendingEmail();
+        });
+      }
+
+      const form = document.querySelector("#leadForm");
+      if (!form) return;
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const previousRecord = records.find((record) => record.id === state.editingId);
+        const previousStatus = previousRecord?.status || "";
+        const newRecord = {
+          id: state.editingId || nextRecordId(),
+          source: document.querySelector("#source").value,
+          customer: document.querySelector("#customer").value,
+          phone: document.querySelector("#phone").value,
+          email: document.querySelector("#email").value,
+          address: document.querySelector("#address").value,
+          vehicle: {
+            year: document.querySelector("#year").value,
+            make: document.querySelector("#make").value,
+            model: document.querySelector("#model").value,
+            vin: document.querySelector("#vin").value
+          },
+          part: document.querySelector("#part").value,
+          status: document.querySelector("#status").value,
+          agent: document.querySelector("#agent").value,
+          priority: "Normal",
+          sale: toNumber(document.querySelector("#sale").value),
+          supplierCost: toNumber(document.querySelector("#supplierCost").value),
+          shippingCost: toNumber(document.querySelector("#shippingCost").value),
+          supplier: document.querySelector("#supplier").value,
+          tracking: document.querySelector("#tracking").value,
+          eta: document.querySelector("#eta").value || "New",
+          notes: document.querySelector("#notes").value || "New intake needs qualification."
+        };
+
+        try {
+          const savedRecord = await saveLeadToSupabase(newRecord);
+          const existingIndex = records.findIndex((record) => record.id === savedRecord.id);
+          if (existingIndex >= 0) {
+            records[existingIndex] = savedRecord;
+          } else {
+            records.unshift(savedRecord);
+          }
+          state.editingId = null;
+          state.dbMessage = supabaseClient ? "Lead saved to Supabase." : "Lead saved in demo mode only. Add Supabase keys to make it permanent.";
+          if (savedRecord.status !== previousStatus) {
+            const emailType = emailTypeForStatus(savedRecord.status);
+            if (emailType) {
+              state.pendingEmail = {
+                leadId: savedRecord.id,
+                emailType,
+                ...buildEmailTemplate(savedRecord, emailType)
+              };
+            }
+          }
+          form.reset();
+          render();
+        } catch (error) {
+          state.dbMessage = `Supabase save error: ${error.message}`;
+          render();
+        }
+      });
+    }
+
+    document.querySelectorAll("[data-view]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setView(button.dataset.view);
+      });
+    });
+
+    document.addEventListener("click", async (event) => {
+      const actionButton = event.target.closest("[data-action]");
+      if (!actionButton) return;
+
+      const id = actionButton.dataset.id;
+      if (actionButton.dataset.action === "edit") {
+        state.editingId = id;
+        setView("leads");
+        return;
+      }
+
+      if (actionButton.dataset.action === "delete") {
+        if (!ADMIN_MODE) {
+          alert("Only admin can delete leads.");
+          return;
+        }
+        const record = records.find((item) => item.id === id);
+        if (!record || !confirm(`Delete lead ${record.customer}?`)) return;
+
+        try {
+          const deleted = await deleteLeadFromSupabase(id);
+          if (deleted === false) return;
+          records = records.filter((item) => item.id !== id);
+          state.dbMessage = supabaseClient ? "Lead deleted from Supabase." : "Lead deleted from demo list.";
+          if (state.editingId === id) state.editingId = null;
+          render();
+        } catch (error) {
+          state.dbMessage = `Supabase delete error: ${error.message}`;
+          render();
+        }
+      }
+    });
+
+    document.addEventListener("change", async (event) => {
+      const statusDropdown = event.target.closest("[data-action='status-change']");
+      if (!statusDropdown) return;
+      await updateLeadStatus(statusDropdown.dataset.id, statusDropdown.value);
+    });
+
+    document.querySelectorAll("[data-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.filter = button.dataset.filter;
+        document.querySelectorAll("[data-filter]").forEach((item) => item.classList.toggle("active", item.dataset.filter === state.filter));
+        render();
+      });
+    });
+
+    document.querySelector("#searchInput").addEventListener("input", (event) => {
+      state.search = event.target.value;
+      render();
+    });
+
+    document.querySelector("#exportBtn").addEventListener("click", () => {
+      const rows = filteredRecords();
+      const csv = [
+        ["ID", "Source", "Customer", "Phone", "Email", "Address", "Year", "Make", "Model", "VIN", "Part", "Status", "Sale", "Supplier Cost", "Shipping", "Margin", "Supplier", "Tracking", "Agent"],
+        ...rows.map((record) => [
+          record.id, record.source, record.customer, record.phone, record.email, record.address,
+          record.vehicle.year, record.vehicle.make, record.vehicle.model, record.vehicle.vin,
+          record.part, record.status, record.sale, record.supplierCost, record.shippingCost,
+          margin(record), record.supplier, record.tracking, record.agent
+        ])
+      ].map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "revive-auto-parts-crm-export.csv";
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+
+    render();
+    loadLeadsFromSupabase();
+  </script>
+</body>
+</html>
